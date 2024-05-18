@@ -4,7 +4,7 @@ const { smtpUserName, smtpPassword } = require("./secret");
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // Use `true` for port 465, `false` for all other ports
+  secure: false,
   auth: {
     user: smtpUserName,
     pass: smtpPassword,
@@ -14,10 +14,10 @@ const transporter = nodemailer.createTransport({
 const sendingEmail = async (emailData) => {
   try {
     const options = {
-      from: smtpUserName, // sender address
-      to: emailData.email, // list of receivers
-      subject: emailData.subject, // Subject line
-      html: emailData.html, // html body
+      from: smtpUserName,
+      to: emailData.email,
+      subject: emailData.subject,
+      html: emailData.html,
     };
     const info = await transporter.sendMail(options);
     console.log("Message sent: %s", info.messageId);

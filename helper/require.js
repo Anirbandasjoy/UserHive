@@ -5,6 +5,7 @@ const createError = require("http-errors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const cookieParser = require("cookie-parser");
 module.exports = {
   cors,
   Schema,
@@ -14,4 +15,5 @@ module.exports = {
   bcrypt,
   jwt,
   nodemailer,
+  cookieParser
 };

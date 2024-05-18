@@ -1,7 +1,7 @@
 const sendingEmail = require("../helper/email");
 const createToken = require("../helper/jsonwebToken");
 const { bcrypt, createError, jwt } = require("../helper/require");
-const { SECRETKEY } = require("../helper/secret");
+const { SECRETKEY, clientUrl } = require("../helper/secret");
 const User = require("../models/user.models");
 const { successResponse } = require("./response.controller");
 
@@ -9,6 +9,11 @@ const handleUserRegistationProcess = async (req, res, next) => {
   try {
     const { name, email, password, phone } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const userExists = await User.exists({ email });
+    if (userExists) {
+      throw createError(403, "User already exists");
+    }
 
     const newUser = {
       name,
@@ -64,7 +69,7 @@ const handleUserRegistationProcess = async (req, res, next) => {
             <div class="container">
               <h1>Activation Email</h1>
               <p>Please activate your email by clicking the button below:</p>
-              <a class="button" href="http://locahost:5473/user/active/${token}">Activate</a>
+              <a class="button" href=${clientUrl}/user/activate/${token}">Activate</a>
             </div>
           </body>
           </html>
@@ -92,7 +97,7 @@ const handleUserRegistation = async (req, res, next) => {
     const { token } = req.body;
     if (!token) throw createError(404, "token not found");
     const decoded = jwt.verify(token, SECRETKEY);
-    if (!decoded) throw createError(409, "User not registerd");
+    if (!decoded) throw createError(409, "User not registerd invalid token");
     const userExists = await User.exists({ email: decoded.email });
     if (userExists) {
       throw createError(403, "User already exists");
@@ -106,7 +111,18 @@ const handleUserRegistation = async (req, res, next) => {
   }
 };
 
+const handleGetCurrentUser = async (req, res, next) => {
+  try {
+    successResponse(res, {
+      payload: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   handleUserRegistationProcess,
   handleUserRegistation,
+  handleGetCurrentUser,
 };
